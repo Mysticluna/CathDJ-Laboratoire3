@@ -20,8 +20,10 @@ public class BluetoothDiscoveryReceiver extends BroadcastReceiver {
 
     public BluetoothDiscoveryReceiver(Context context) {
         mContext = context;
-        mNewDeviceArrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1);
-        mPairedDeviceArrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1);
+        mNewDeviceArrayAdapter =
+                new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1);
+        mPairedDeviceArrayAdapter =
+                new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1);
     }
 
     public ArrayAdapter<String> getNewDeviceArrayAdapter() {
@@ -34,7 +36,8 @@ public class BluetoothDiscoveryReceiver extends BroadcastReceiver {
 
     public void searchPairedDevices() {
         // On vérifie si un appareil à proximité est déjà reconnu par notre cellulaire/tablette
-        Set<BluetoothDevice> pairedDevices = ((Lab3App) mContext.getApplicationContext()).btAdapter.getBondedDevices();
+        Set<BluetoothDevice> pairedDevices =
+                ((Lab3App) mContext.getApplicationContext()).btAdapter.getBondedDevices();
 
         // Vide le contenu du ArrayAdapter avant de faire la recherche. Cela évite ainsi les conflits.
         mPairedDeviceArrayAdapter.clear();
@@ -71,8 +74,15 @@ public class BluetoothDiscoveryReceiver extends BroadcastReceiver {
             BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
             // On se crée une liste view et on montre le nom et l'adresse
             mNewDeviceArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+        } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+
+            if (mNewDeviceArrayAdapter.getCount() == 0) {
+                String noDevices = "rien";
+                mNewDeviceArrayAdapter.add(noDevices);
+            }
+
         }
 
     }
-
 }
+
