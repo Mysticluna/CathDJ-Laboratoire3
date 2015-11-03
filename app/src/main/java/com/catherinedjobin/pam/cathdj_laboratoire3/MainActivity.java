@@ -1,23 +1,27 @@
 package com.catherinedjobin.pam.cathdj_laboratoire3;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.annotation.MainThread;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
-import java.util.List;
-import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
     private BluetoothDiscoveryReceiver btDiscovery;
     private static final int REQUEST_ENABLE_BT = 69;
+    private static String EXTRA_DEVICE_ADDRESS = "device_address";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             btDiscovery = new BluetoothDiscoveryReceiver(this);
 
+            // On enregistre le receiver quand l'appareil en recherche d'autres
             IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
             // Désenregistre dans le onDestroy()
             this.registerReceiver(btDiscovery, filter);
@@ -42,11 +47,12 @@ public class MainActivity extends AppCompatActivity {
             btDiscovery.searchPairedDevices();
             ListView lvPairedDevice = (ListView) findViewById(R.id.lvDevicePaired);
             lvPairedDevice.setAdapter(btDiscovery.getPairedDeviceArrayAdapter());
+            lvPairedDevice.setOnItemClickListener(mDeviceClickListener);
 
             // Affiche une liste des appareils non-connectés à l'appareil présent, mais tout près de celui-ci
             ListView lvDiscoveredDevice = (ListView) findViewById(R.id.lvDeviceDiscovered);
             lvDiscoveredDevice.setAdapter(btDiscovery.getNewDeviceArrayAdapter());
-
+            lvDiscoveredDevice.setOnItemClickListener(mDeviceClickListener);
         }
     }
 
@@ -84,4 +90,21 @@ public class MainActivity extends AppCompatActivity {
      * On se crée un OnItemClickListener pour être en mesure de choisir l'appareil auquel se connecté.
      */
 
+    private AdapterView.OnItemClickListener mDeviceClickListener = new AdapterView.OnItemClickListener() {
+        public void onItemClick(AdapterView<?> av, View v, int arg2, long arg3) {
+            // On annule la recherche des appareils à proximité, car on ne veut pas que ça consomme trop d'énergie!
+            ((Lab3App) MainActivity.this.getApplication()).btAdapter.cancelDiscovery();
+
+            // On recherche l'adresse MAC de l'appareil
+            String info = ((TextView) v).getText().toString();
+            String address = info.substring(info.length() - 17);
+
+            // On crée le résultat de l'intent et on inclu l'adresse MAC
+            Intent intent = new Intent();
+            intent.putExtra(EXTRA_DEVICE_ADDRESS, address);
+
+            // On établie le résultat et on fini cette activité
+            setResult(Activity.RESULT_OK, intent);
+        }
+    };
 }

@@ -1,5 +1,6 @@
 package com.catherinedjobin.pam.cathdj_laboratoire3;
 
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -51,6 +52,13 @@ public class BluetoothDiscoveryReceiver extends BroadcastReceiver {
             String noDevices = "Oups, il n'y a pas d'appareil de connecté à celui-ci.";
             mPairedDeviceArrayAdapter.add(noDevices);
         }
+    }
+
+    // Fonction pour rendre l'appareil repérable par les autres.
+    public void beDiscoverable() {
+        Intent intentDiscoverable = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+        intentDiscoverable.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+        mContext.startActivity(intentDiscoverable);
     }
 
     @Override

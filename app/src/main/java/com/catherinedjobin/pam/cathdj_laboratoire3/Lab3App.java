@@ -12,6 +12,7 @@ public class Lab3App extends Application {
 
     public final BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
 
+
     @Override
     public void onCreate() {
         super.onCreate();
