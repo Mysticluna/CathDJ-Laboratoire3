@@ -77,7 +77,7 @@ public class BluetoothDiscoveryReceiver extends BroadcastReceiver {
         } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
 
             if (mNewDeviceArrayAdapter.getCount() == 0) {
-                String noDevices = "rien";
+                String noDevices = "Il n'y a pas d'appareils à proximité";
                 mNewDeviceArrayAdapter.add(noDevices);
             }
 

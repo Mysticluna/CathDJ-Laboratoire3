@@ -14,18 +14,33 @@
     tools:context="com.catherinedjobin.pam.cathdj_laboratoire3.SearchDeviceActivity">
 
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvNewDevice"
+        android:text="Nouveaux appareils"/>
+
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/lvDeviceDiscovered"
+        android:layout_below="@id/tvNewDevice"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvOldDevice"
+        android:text="Appareils déjà connectés"
+        android:layout_below="@id/lvDeviceDiscovered"/>
 
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/lvDevicePaired"
+        android:layout_below="@id/tvOldDevice"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"/>
 

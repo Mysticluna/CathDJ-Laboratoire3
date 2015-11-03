@@ -50,6 +50,10 @@ public class SearchDeviceActivity extends AppCompatActivity {
             lvDiscoveredDevice.setAdapter(btDiscovery.getNewDeviceArrayAdapter());
             lvDiscoveredDevice.setOnItemClickListener(mDeviceClickListener);
 
+            // Quand la découverte est fini
+            filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+            this.registerReceiver(btDiscovery, filter);
+
             // On commence la recherche des appareils à proximité
             doDiscovery();
 
