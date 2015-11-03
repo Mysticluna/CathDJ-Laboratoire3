@@ -17,9 +17,16 @@ public class BluetoothDiscoveryReceiver extends BroadcastReceiver {
     private Context mContext;
     private ArrayAdapter<String> mNewDeviceArrayAdapter;
     private ArrayAdapter<String> mPairedDeviceArrayAdapter;
+    private DiscoveryFinishedListener mListener;
 
-    public BluetoothDiscoveryReceiver(Context context) {
+    public interface DiscoveryFinishedListener {
+        void onFinished();
+    }
+
+    public BluetoothDiscoveryReceiver(Context context, DiscoveryFinishedListener listener) {
         mContext = context;
+        mListener = listener;
+
         mNewDeviceArrayAdapter =
                 new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1);
         mPairedDeviceArrayAdapter =
@@ -75,7 +82,7 @@ public class BluetoothDiscoveryReceiver extends BroadcastReceiver {
             // On se crée une liste view et on montre le nom et l'adresse
             mNewDeviceArrayAdapter.add(device.getName() + "\n" + device.getAddress());
         } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-
+            mListener.onFinished();
             if (mNewDeviceArrayAdapter.getCount() == 0) {
                 String noDevices = "Il n'y a pas d'appareils à proximité";
                 mNewDeviceArrayAdapter.add(noDevices);

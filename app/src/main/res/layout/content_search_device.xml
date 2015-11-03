@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -11,7 +11,8 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_search_device"
-    tools:context="com.catherinedjobin.pam.cathdj_laboratoire3.SearchDeviceActivity">
+    tools:context="com.catherinedjobin.pam.cathdj_laboratoire3.SearchDeviceActivity"
+    android:orientation="vertical">
 
 
     <TextView
@@ -20,11 +21,20 @@
         android:id="@+id/tvNewDevice"
         android:text="Nouveaux appareils"/>
 
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar"
+        android:indeterminate="true"
+        android:visibility="gone"
+        android:layout_below="@id/tvNewDevice"
+        android:layout_gravity="center"/>
+
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/lvDeviceDiscovered"
-        android:layout_below="@id/tvNewDevice"
+        android:layout_below="@id/progressBar"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"/>
@@ -44,4 +54,4 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"/>
 
-</RelativeLayout>
+</LinearLayout>

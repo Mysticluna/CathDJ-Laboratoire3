@@ -11,13 +11,15 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
-public class SearchDeviceActivity extends AppCompatActivity {
+public class SearchDeviceActivity extends AppCompatActivity implements BluetoothDiscoveryReceiver.DiscoveryFinishedListener {
 
     private BluetoothDiscoveryReceiver btDiscovery;
-    public static final int REQUEST_ENABLE_BT = 69;
     private static String EXTRA_DEVICE_ADDRESS = "device_address";
+
+    public static final int REQUEST_ENABLE_BT = 69;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +34,7 @@ public class SearchDeviceActivity extends AppCompatActivity {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         } else {
-            btDiscovery = new BluetoothDiscoveryReceiver(this);
+            btDiscovery = new BluetoothDiscoveryReceiver(this, this);
 
             // On enregistre le receiver quand l'appareil en recherche d'autres
             IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
@@ -97,10 +99,8 @@ public class SearchDeviceActivity extends AppCompatActivity {
      */
     private void doDiscovery() {
 
-        // Une barre de prograssion afin de présenter la recherche
-        setProgressBarIndeterminateVisibility(true);
-        // TODO : Ajouter une ressource
-        setTitle("Recherche en cours");
+        // Une barre de progression afin de présenter la recherche
+        ((ProgressBar) findViewById(R.id.progressBar)).setVisibility(View.VISIBLE);
 
         // Si on est déjà en recherche d'appareil, on l'annule.
         if (((Lab3App) this.getApplication()).btAdapter.isDiscovering()) {
@@ -111,4 +111,8 @@ public class SearchDeviceActivity extends AppCompatActivity {
         ((Lab3App) this.getApplication()).btAdapter.startDiscovery();
     }
 
+    @Override
+    public void onFinished() {
+        ((ProgressBar) findViewById(R.id.progressBar)).setVisibility(View.GONE);
+    }
 }
