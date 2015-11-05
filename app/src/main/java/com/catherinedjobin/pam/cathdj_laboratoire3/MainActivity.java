@@ -8,7 +8,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-
 public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_GALLERY_PICK = 1337;
@@ -16,16 +15,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        this.setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar) this.findViewById(R.id.toolbar);
+        this.setSupportActionBar(toolbar);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+        this.getMenuInflater().inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -43,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
     public void onClickSendImage(View V) {
         Intent galleryPickIntent = new Intent(Intent.ACTION_PICK);
         galleryPickIntent.setType("image/*");
@@ -51,6 +49,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickOpenSearchDevice(View v) {
-        startActivityForResult(new Intent(this, SearchDeviceActivity.class), SearchDeviceActivity.REQUEST_ENABLE_BT);
+        this.startActivityForResult(new Intent(this, SearchDeviceActivity.class),
+                                    SearchDeviceActivity.REQUEST_ENABLE_BT);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }
