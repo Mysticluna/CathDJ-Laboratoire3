@@ -7,6 +7,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -50,11 +51,33 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClickOpenSearchDevice(View v) {
         this.startActivityForResult(new Intent(this, SearchDeviceActivity.class),
-                                    SearchDeviceActivity.REQUEST_ENABLE_BT);
+                                    SearchDeviceActivity.REQUEST_SELECT_DEVICE);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if ((resultCode == RESULT_OK) && (data != null)) {
+            switch (requestCode) {
+                case SearchDeviceActivity.REQUEST_SELECT_DEVICE:
+                    // TODO: Connections
+                    String address =
+                        data.getStringExtra(SearchDeviceActivity.EXTRA_DEVICE_ADDRESS);
+                    Toast.makeText(this, "Addresse de l'appareil: " + address,
+                                   Toast.LENGTH_LONG).show();
+                    break;
+                case REQUEST_GALLERY_PICK:
+                    // TODO: Afficher l'image et le de partage
+                    Toast.makeText(this, "Uri de l'image: " + data.getData(), Toast.LENGTH_LONG)
+                         .show();
+                    break;
+                default:
+                    break;
+            }
+        } else if (resultCode == RESULT_CANCELED) {
+            // TODO: String ressources
+            Toast.makeText(this, "Operation annulée", Toast.LENGTH_LONG).show();
+        }
+
     }
 }

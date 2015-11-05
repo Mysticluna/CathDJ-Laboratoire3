@@ -48,7 +48,7 @@ public class BluetoothDiscoveryReceiver extends BroadcastReceiver {
     public void searchPairedDevices() {
         // On vérifie si un appareil à proximité est déjà reconnu par notre cellulaire/tablette
         Set<BluetoothDevice> pairedDevices =
-            ((Lab3App) this.mContext.getApplicationContext()).btAdapter.getBondedDevices();
+            ((Lab3App) this.mContext.getApplicationContext()).getBtAdapter().getBondedDevices();
 
         // Vide le contenu du ArrayAdapter avant de faire la recherche. Cela évite ainsi les
         // conflits.

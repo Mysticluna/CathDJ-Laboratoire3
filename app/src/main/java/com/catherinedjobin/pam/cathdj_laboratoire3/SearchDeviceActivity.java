@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.catherinedjobin.pam.cathdj_laboratoire3.BluetoothDiscoveryReceiver
@@ -24,7 +25,8 @@ public class SearchDeviceActivity extends AppCompatActivity
     implements BluetoothDiscoveryListener {
 
     public static final int REQUEST_ENABLE_BT = 69;
-    private static final String EXTRA_DEVICE_ADDRESS = "device_address";
+    public static final int REQUEST_SELECT_DEVICE = 70;
+    public static final String EXTRA_DEVICE_ADDRESS = "device_address";
     /**
      * On se crée un OnItemClickListener pour être en mesure de choisir l'appareil auquel se
      * connecté.
@@ -34,7 +36,8 @@ public class SearchDeviceActivity extends AppCompatActivity
             public void onItemClick(AdapterView<?> av, View v, int arg2, long arg3) {
                 // On annule la recherche des appareils à proximité, car on ne veut pas que ça
                 // consomme trop d'énergie!
-                ((Lab3App) SearchDeviceActivity.this.getApplication()).btAdapter.cancelDiscovery();
+                ((Lab3App) SearchDeviceActivity.this.getApplication()).getBtAdapter()
+                                                                      .cancelDiscovery();
 
                 // On recherche l'adresse MAC de l'appareil
                 String info = ((TextView) v).getText().toString();
@@ -49,7 +52,9 @@ public class SearchDeviceActivity extends AppCompatActivity
                 SearchDeviceActivity.this.finish();
             }
         };
+    private ProgressBar discoveryProgressBar;
     private BluetoothDiscoveryReceiver btDiscovery;
+    private ListView lvDiscoveredDevice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +65,7 @@ public class SearchDeviceActivity extends AppCompatActivity
 
         // On demande l'autorisation d'activer le bluetooth, s'il est installé.
         // Si l'appareil n'a pas le bluetooth, l'application plante directement au démarrage.
-        if ((!((Lab3App) this.getApplication()).btAdapter.isEnabled())) {
+        if ((!((Lab3App) this.getApplication()).getBtAdapter().isEnabled())) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             this.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         } else {
@@ -84,9 +89,9 @@ public class SearchDeviceActivity extends AppCompatActivity
 
             // Affiche une liste des appareils non-connectés à l'appareil présent, mais tout près de
             // celui-ci
-            ListView lvDiscoveredDevice = (ListView) this.findViewById(R.id.lvDeviceDiscovered);
-            lvDiscoveredDevice.setAdapter(this.btDiscovery.getNewDeviceArrayAdapter());
-            lvDiscoveredDevice.setOnItemClickListener(this.mDeviceClickListener);
+            this.lvDiscoveredDevice = (ListView) this.findViewById(R.id.lvDeviceDiscovered);
+            this.lvDiscoveredDevice.setAdapter(this.btDiscovery.getNewDeviceArrayAdapter());
+            this.lvDiscoveredDevice.setOnItemClickListener(this.mDeviceClickListener);
 
             filter = new IntentFilter();
             this.registerReceiver(this.btDiscovery, filter);
@@ -99,6 +104,7 @@ public class SearchDeviceActivity extends AppCompatActivity
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        this.discoveryProgressBar = ((ProgressBar) this.findViewById(R.id.progressBar));
     }
 
     @Override
@@ -114,27 +120,25 @@ public class SearchDeviceActivity extends AppCompatActivity
      */
     private void doDiscovery() {
         // Si on est déjà en recherche d'appareil, on l'annule.
-        if (((Lab3App) this.getApplication()).btAdapter.isDiscovering()) {
-            ((Lab3App) this.getApplication()).btAdapter.cancelDiscovery();
+        if (((Lab3App) this.getApplication()).getBtAdapter().isDiscovering()) {
+            ((Lab3App) this.getApplication()).getBtAdapter().cancelDiscovery();
         }
 
         // Ensuite, on demande de recherche avec le btAdapter
-        ((Lab3App) this.getApplication()).btAdapter.startDiscovery();
+        ((Lab3App) this.getApplication()).getBtAdapter().startDiscovery();
     }
 
     @Override
     public void onDiscoveryStarted() {
         // Affiche Une barre de progression afin de présenter la recherche
-        this.findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
-        this.findViewById(R.id.lvDeviceDiscovered).setVisibility(View.GONE);
-
-        this.setTitle("Recherche en cours");
+        this.discoveryProgressBar.setVisibility(View.VISIBLE);
+        this.lvDiscoveredDevice.setVisibility(View.GONE);
     }
 
     @Override
     public void onDiscoveryFinished() {
-        this.findViewById(R.id.progressBar).setVisibility(View.GONE);
-        this.findViewById(R.id.lvDeviceDiscovered).setVisibility(View.VISIBLE);
+        this.discoveryProgressBar.setVisibility(View.GONE);
+        this.lvDiscoveredDevice.setVisibility(View.VISIBLE);
         this.setTitle(this.getString(R.string.title_activity_search_device));
     }
 
