@@ -6,7 +6,6 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -43,7 +42,7 @@ public class SearchDeviceActivity extends AppCompatActivity
                 String info = ((TextView) v).getText().toString();
                 String address = info.substring(info.length() - 17);
 
-                // On crée le résultat de l'intent et on inclu l'adresse MAC
+                // On crée le résultat de l'intent et on inclue l'adresse MAC
                 Intent intent = new Intent();
                 intent.putExtra(EXTRA_DEVICE_ADDRESS, address);
 
@@ -111,6 +110,10 @@ public class SearchDeviceActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
 
+        // Si on est déjà en recherche d'appareil, on l'annule.
+        if (((Lab3App) this.getApplication()).getBtAdapter().isDiscovering()) {
+            ((Lab3App) this.getApplication()).getBtAdapter().cancelDiscovery();
+        }
         // Désenregistre le btDiscovery
         this.unregisterReceiver(this.btDiscovery);
     }
@@ -152,7 +155,8 @@ public class SearchDeviceActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(this);
+                this.setResult(RESULT_CANCELED);
+                this.finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

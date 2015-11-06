@@ -20,7 +20,7 @@
 		android:layout_alignParentStart="true"
 		android:layout_alignParentTop="true"
 		android:onClick="onClickOpenSearchDevice"
-		android:text="Rechercher les appareils"/>
+		android:text="Connecter à un appareil"/>
 	<Button
 		android:id="@+id/btnSendImage"
 		android:layout_width="wrap_content"

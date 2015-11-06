@@ -70,7 +70,9 @@ public class BluetoothDiscoveryReceiver extends BroadcastReceiver {
         }
     }
 
-    // Fonction pour rendre l'appareil repérable par les autres.
+    /**
+     * Fonction pour rendre l'appareil repérable par les autres.
+     */
     public void beDiscoverable() {
         Intent intentDiscoverable = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         intentDiscoverable.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
@@ -84,9 +86,11 @@ public class BluetoothDiscoveryReceiver extends BroadcastReceiver {
         if (BluetoothDevice.ACTION_FOUND.equals(action)) {
             // On va chercher l'objet via l'intent
             BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-            // On ajoute l'appareil à la liste seulement s'il n'est déjà authenfier.
+            // On ajoute l'appareil à la liste seulement s'il n'est déjà authentifier.
             // On montre dans la liste view le nom et l'adresse.
-            this.mNewDeviceArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+            if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
+                this.mNewDeviceArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+            }
 
         } else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
             this.mListener.onDiscoveryStarted();
