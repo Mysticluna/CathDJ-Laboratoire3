@@ -28,6 +28,9 @@ public class MainActivity extends AppCompatActivity {
         this.setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) this.findViewById(R.id.toolbar);
         this.setSupportActionBar(toolbar);
+        if (((Lab3App) this.getApplication()).getBtAdapter() != null) {
+            ((Lab3App) this.getApplication()).startServer();
+        }
     }
 
     @Override
@@ -53,17 +56,17 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            case R.id.action_discoverable:
+                ((Lab3App) this.getApplication()).makeDiscoverable(this);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -135,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
                         // On ferme et supprime le socket.
                         // N.B: Le finalizer de BluetoothSocket appelle close().
                         this.clientSocket = null;
+                        ((Lab3App) this.getApplication()).startServer();
                     }
                     break;
                 default:

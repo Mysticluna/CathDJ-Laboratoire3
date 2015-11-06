@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.catherinedjobin.pam.cathdj_laboratoire3">
+<manifest
+	package="com.catherinedjobin.pam.cathdj_laboratoire3"
+	xmlns:android="http://schemas.android.com/apk/res/android">
 	<!-- On ajoute la permission pour utiliser le bluetooth du cellulaire/tablette -->
 	<uses-permission android:name="android.permission.BLUETOOTH"/>
 	<uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 	<!-- L'application s'installera seulement sur des cellulaires/tablettes qui ont un bluetooth -->
 	<uses-feature android:name="android.hardware.bluetooth"/>
 	<application

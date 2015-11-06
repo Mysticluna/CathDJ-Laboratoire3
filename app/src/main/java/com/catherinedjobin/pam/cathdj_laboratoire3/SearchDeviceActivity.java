@@ -119,7 +119,7 @@ public class SearchDeviceActivity extends AppCompatActivity
     }
 
     /**
-     * Fonction
+     * Fonction pour démarrer la découverte d'appareil distant
      */
     private void doDiscovery() {
         // Si on est déjà en recherche d'appareil, on l'annule.
@@ -153,10 +153,16 @@ public class SearchDeviceActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
             case android.R.id.home:
                 this.setResult(RESULT_CANCELED);
                 this.finish();
+                return true;
+            case R.id.action_discoverable:
+                ((Lab3App) this.getApplication()).makeDiscoverable(this);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

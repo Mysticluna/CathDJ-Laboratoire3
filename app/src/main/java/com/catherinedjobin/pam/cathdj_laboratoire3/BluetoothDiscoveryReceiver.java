@@ -70,15 +70,6 @@ public class BluetoothDiscoveryReceiver extends BroadcastReceiver {
         }
     }
 
-    /**
-     * Fonction pour rendre l'appareil repérable par les autres.
-     */
-    public void beDiscoverable() {
-        Intent intentDiscoverable = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-        intentDiscoverable.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-        this.mContext.startActivity(intentDiscoverable);
-    }
-
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
