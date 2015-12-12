@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
             switch (requestCode) {
                 case SearchDeviceActivity.REQUEST_SELECT_DEVICE:
                     String address =
-                        data.getStringExtra(SearchDeviceActivity.EXTRA_DEVICE_ADDRESS);
+                            data.getStringExtra(SearchDeviceActivity.EXTRA_DEVICE_ADDRESS);
                     if (address != null) {
                         if (this.clientSocket != null) {
                             try {
@@ -88,18 +88,22 @@ public class MainActivity extends AppCompatActivity {
                         }
                         try {
                             this.clientSocket =
-                                ((Lab3App) this.getApplication()).connectToDevice(address);
-                            Toast.makeText(this, "La connection réussie", Toast.LENGTH_SHORT)
+                                    ((Lab3App) this.getApplication()).connectToDevice(address);
+                            Toast.makeText(this,
+                                           R.string.message_info_connection_success,
+                                           Toast.LENGTH_SHORT
+                                          )
                                  .show();
 
                         } catch (IOException e) {
                             e.printStackTrace();
-                            Toast.makeText(this, "La connection a échouée", Toast.LENGTH_SHORT)
+                            Toast.makeText(this,
+                                           R.string.message_error_connection_failed,
+                                           Toast.LENGTH_SHORT
+                                          )
                                  .show();
                         } catch (IllegalArgumentException e) {
                             e.printStackTrace();
-                            Toast.makeText(this, "Adresse MAC invalide", Toast.LENGTH_SHORT)
-                                 .show();
                         }
                     }
                     break;
@@ -110,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                     OutputStream outStream = null;
                     try {
                         Bitmap imageBitmap =
-                            Media.getBitmap(this.getContentResolver(), data.getData());
+                                Media.getBitmap(this.getContentResolver(), data.getData());
                         if ((imageBitmap != null) && (this.clientSocket != null)) {
                             outStream = this.clientSocket.getOutputStream();
                             int byteCount = BitmapCompat.getAllocationByteCount(imageBitmap);
@@ -122,8 +126,9 @@ public class MainActivity extends AppCompatActivity {
                     } catch (IOException e) {
                         e.printStackTrace();
                         Toast.makeText(this,
-                                       "Le chargement de l'image à échoué",
-                                       Toast.LENGTH_SHORT)
+                                       R.string.message_error_image_loading_failed,
+                                       Toast.LENGTH_SHORT
+                                      )
                              .show();
                     } finally {
                         if (outStream != null) {
@@ -131,7 +136,10 @@ public class MainActivity extends AppCompatActivity {
                                 outStream.close();
                             } catch (IOException e) {
                                 e.printStackTrace();
-                                Toast.makeText(this, "L'envoi a échoué", Toast.LENGTH_SHORT)
+                                Toast.makeText(this,
+                                               R.string.message_error_image_sending_failed,
+                                               Toast.LENGTH_SHORT
+                                              )
                                      .show();
                             }
                         }
@@ -146,7 +154,8 @@ public class MainActivity extends AppCompatActivity {
             }
         } else if (resultCode == RESULT_CANCELED) {
             // TODO: String ressources
-            Toast.makeText(this, "L'opération a été annulée", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.message_info_operation_cancelled, Toast.LENGTH_SHORT)
+                 .show();
         }
 
     }
@@ -154,8 +163,9 @@ public class MainActivity extends AppCompatActivity {
     public void onClickSendImage(View v) {
         if (this.clientSocket == null) {
             Toast.makeText(this,
-                           "Non connecté. Veuillez-vous connecter à un appareil",
-                           Toast.LENGTH_LONG)
+                           R.string.message_error_not_connected,
+                           Toast.LENGTH_LONG
+                          )
                  .show();
         } else {
             Intent galleryPickIntent = new Intent(Intent.ACTION_PICK);
@@ -166,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClickOpenSearchDevice(View v) {
         this.startActivityForResult(new Intent(this, SearchDeviceActivity.class),
-                                    SearchDeviceActivity.REQUEST_SELECT_DEVICE);
+                                    SearchDeviceActivity.REQUEST_SELECT_DEVICE
+                                   );
     }
 }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="action_discoverable">Rendre découvrable</string>
+	<string name="action_refresh">Rafraîchir</string>
+	<string name="message_error_connection_failed">Connexion a échouée</string>
+	<string name="message_error_image_loading_failed">Le chargement de l\'image a échoué</string>
+	<string name="message_info_connection_success">Connexion a réussie</string>
+	<string name="message_info_operation_cancelled">L\'opération a été annulée</string>
+	<string name="title_activity_search_device">Rechercher des appareils</string>
+	<string name="title_activity_search_device_active">En recherche d\'appareils</string>
+	<string name="message_error_image_sending_failed">L\'envoi de l\'image a échoué</string>
+	<string name="message_error_not_connected">Non connecté. Veuillez-vous connecter à un appareil</string>
+</resources>
