@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         this.setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) this.findViewById(R.id.toolbar);
         this.setSupportActionBar(toolbar);
-        if (((Lab3App) this.getApplication()).getBtAdapter() != null) {
+        if (BluetoothController.isBluetoothSupported()) {
             ((Lab3App) this.getApplication()).startServer();
         }
     }
@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
             case R.id.action_discoverable:
-                ((Lab3App) this.getApplication()).makeDiscoverable(this);
+                BluetoothController.makeDiscoverable(this);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

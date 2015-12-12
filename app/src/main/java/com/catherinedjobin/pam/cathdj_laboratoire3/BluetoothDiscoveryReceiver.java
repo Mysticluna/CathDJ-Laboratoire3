@@ -32,9 +32,9 @@ public class BluetoothDiscoveryReceiver extends BroadcastReceiver {
         this.mListener = listener;
 
         this.mNewDeviceArrayAdapter =
-            new ArrayAdapter<>(context, layout.simple_list_item_1);
+                new ArrayAdapter<>(context, layout.simple_list_item_1);
         this.mPairedDeviceArrayAdapter =
-            new ArrayAdapter<>(context, layout.simple_list_item_1);
+                new ArrayAdapter<>(context, layout.simple_list_item_1);
     }
 
     public ArrayAdapter<String> getNewDeviceArrayAdapter() {
@@ -48,7 +48,7 @@ public class BluetoothDiscoveryReceiver extends BroadcastReceiver {
     public void searchPairedDevices() {
         // On vérifie si un appareil à proximité est déjà reconnu par notre cellulaire/tablette
         Set<BluetoothDevice> pairedDevices =
-            ((Lab3App) this.mContext.getApplicationContext()).getBtAdapter().getBondedDevices();
+                BluetoothController.getBluetoothAdapter().getBondedDevices();
 
         // Vide le contenu du ArrayAdapter avant de faire la recherche. Cela évite ainsi les
         // conflits.
