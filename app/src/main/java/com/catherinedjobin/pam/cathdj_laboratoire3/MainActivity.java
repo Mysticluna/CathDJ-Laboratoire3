@@ -2,25 +2,25 @@ package com.catherinedjobin.pam.cathdj_laboratoire3;
 
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.provider.MediaStore.Images.Media;
-import android.support.v4.graphics.BitmapCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
+import java.util.Arrays;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+        implements BluetoothConnectionManager.BluetoothConnectionHandler {
 
     private static final int REQUEST_SEND_IMAGE = 1337;
-    private BluetoothSocket clientSocket;
+    private volatile BluetoothSocket bluetoothSocket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,23 +28,6 @@ public class MainActivity extends AppCompatActivity {
         this.setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) this.findViewById(R.id.toolbar);
         this.setSupportActionBar(toolbar);
-        if (BluetoothController.isBluetoothSupported()) {
-            ((Lab3App) this.getApplication()).startServer();
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        // Ferme la connection si elle existe.
-        if (this.clientSocket != null) {
-            try {
-                this.clientSocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
     }
 
     @Override
@@ -62,10 +45,26 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
             case R.id.action_discoverable:
-                BluetoothController.makeDiscoverable(this);
+                BluetoothConnectionManager.makeDiscoverable(this);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        BluetoothConnectionManager.getInstance().startServer(this);
+    }
+
+    @Override
+    protected synchronized void onStop() {
+        super.onStop();
+        if (this.bluetoothSocket != null) {
+            this.bluetoothSocket = null;
+        } else {
+            BluetoothConnectionManager.getInstance().stopServer();
         }
     }
 
@@ -78,32 +77,27 @@ public class MainActivity extends AppCompatActivity {
                     String address =
                             data.getStringExtra(SearchDeviceActivity.EXTRA_DEVICE_ADDRESS);
                     if (address != null) {
-                        if (this.clientSocket != null) {
-                            try {
-                                this.clientSocket.close();
-                                this.clientSocket = null;
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
+                        BluetoothSocket testSocket = null;
                         try {
-                            this.clientSocket =
-                                    ((Lab3App) this.getApplication()).connectToDevice(address);
-                            Toast.makeText(this,
-                                           R.string.message_info_connection_success,
-                                           Toast.LENGTH_SHORT
-                                          )
-                                 .show();
-
+                            testSocket = BluetoothConnectionManager.getInstance()
+                                                                   .connectToDevice(address);
+                            OutputStream stream = testSocket.getOutputStream();
+                            stream.write("Hello".getBytes());
+                            stream.flush();
                         } catch (IOException e) {
                             e.printStackTrace();
                             Toast.makeText(this,
                                            R.string.message_error_connection_failed,
                                            Toast.LENGTH_SHORT
-                                          )
-                                 .show();
-                        } catch (IllegalArgumentException e) {
-                            e.printStackTrace();
+                                          ).show();
+                        } finally {
+                            if (testSocket != null) {
+                                try {
+                                    testSocket.close();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
                         }
                     }
                     break;
@@ -111,43 +105,10 @@ public class MainActivity extends AppCompatActivity {
                     // TODO: Afficher l'image
                     Toast.makeText(this, "Uri de l'image: " + data.getData(), Toast.LENGTH_SHORT)
                          .show();
-                    OutputStream outStream = null;
-                    try {
-                        Bitmap imageBitmap =
-                                Media.getBitmap(this.getContentResolver(), data.getData());
-                        if ((imageBitmap != null) && (this.clientSocket != null)) {
-                            outStream = this.clientSocket.getOutputStream();
-                            int byteCount = BitmapCompat.getAllocationByteCount(imageBitmap);
-                            ByteBuffer buffer = ByteBuffer.allocate(byteCount);
-                            imageBitmap.copyPixelsToBuffer(buffer);
-                            outStream.write(buffer.array());
-                            outStream.flush();
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        Toast.makeText(this,
-                                       R.string.message_error_image_loading_failed,
-                                       Toast.LENGTH_SHORT
-                                      )
-                             .show();
-                    } finally {
-                        if (outStream != null) {
-                            try {
-                                outStream.close();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                                Toast.makeText(this,
-                                               R.string.message_error_image_sending_failed,
-                                               Toast.LENGTH_SHORT
-                                              )
-                                     .show();
-                            }
-                        }
-                        // On ferme et supprime le socket.
-                        // N.B: Le finalizer de BluetoothSocket appelle close().
-                        this.clientSocket = null;
-                        ((Lab3App) this.getApplication()).startServer();
-                    }
+                    Toast.makeText(this,
+                                   R.string.message_info_connection_success,
+                                   Toast.LENGTH_SHORT
+                                  ).show();
                     break;
                 default:
                     break;
@@ -160,8 +121,35 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public synchronized void onAccept(BluetoothSocket socket) throws IOException {
+        if (socket != null) {
+            this.bluetoothSocket = socket;
+            InputStream stream = null;
+            try {
+                stream = this.bluetoothSocket.getInputStream();
+                byte[] bytes = new byte[1024 * 1024];
+                Arrays.fill(bytes, (byte) 0);
+                StringBuilder builder = new StringBuilder();
+                int count = stream.read(bytes);
+                while (count != -1) {
+                    builder.append(Arrays.toString(bytes));
+                    count = stream.read(bytes);
+                }
+                Log.d("TEST", builder.toString());
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (stream != null) {
+                    stream.close();
+                }
+            }
+            this.bluetoothSocket = null;
+        }
+    }
+
     public void onClickSendImage(View v) {
-        if (this.clientSocket == null) {
+        if (this.bluetoothSocket == null) {
             Toast.makeText(this,
                            R.string.message_error_not_connected,
                            Toast.LENGTH_LONG
@@ -179,4 +167,5 @@ public class MainActivity extends AppCompatActivity {
                                     SearchDeviceActivity.REQUEST_SELECT_DEVICE
                                    );
     }
+
 }

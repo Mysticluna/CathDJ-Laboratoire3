@@ -37,7 +37,7 @@ public class SearchDeviceActivity extends AppCompatActivity
                 public void onItemClick(AdapterView<?> av, View v, int arg2, long arg3) {
                     // On annule la recherche des appareils à proximité, car on ne veut pas que ça
                     // consomme trop d'énergie!
-                    BluetoothController.getBluetoothAdapter().cancelDiscovery();
+                    BluetoothConnectionManager.getBluetoothAdapter().cancelDiscovery();
 
                     // On recherche l'adresse MAC de l'appareil
                     String info = ((TextView) v).getText().toString();
@@ -71,7 +71,7 @@ public class SearchDeviceActivity extends AppCompatActivity
 
         // On demande l'autorisation d'activer le bluetooth, s'il est installé.
         // Si l'appareil n'a pas le bluetooth, l'application plante directement au démarrage.
-        if (!BluetoothController.getBluetoothAdapter().isEnabled()) {
+        if (!BluetoothConnectionManager.getBluetoothAdapter().isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             this.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         } else {
@@ -120,8 +120,8 @@ public class SearchDeviceActivity extends AppCompatActivity
         super.onDestroy();
 
         // Si on est déjà en recherche d'appareil, on l'annule.
-        if (BluetoothController.getBluetoothAdapter().isDiscovering()) {
-            BluetoothController.getBluetoothAdapter().cancelDiscovery();
+        if (BluetoothConnectionManager.getBluetoothAdapter().isDiscovering()) {
+            BluetoothConnectionManager.getBluetoothAdapter().cancelDiscovery();
         }
         // Désenregistre le btDiscovery
         this.unregisterReceiver(this.btDiscovery);
@@ -132,12 +132,12 @@ public class SearchDeviceActivity extends AppCompatActivity
      */
     private void doDiscovery() {
         // Si on est déjà en recherche d'appareil, on l'annule.
-        if (BluetoothController.getBluetoothAdapter().isDiscovering()) {
-            BluetoothController.getBluetoothAdapter().cancelDiscovery();
+        if (BluetoothConnectionManager.getBluetoothAdapter().isDiscovering()) {
+            BluetoothConnectionManager.getBluetoothAdapter().cancelDiscovery();
         }
 
         // Ensuite, on demande de recherche avec le btAdapter
-        BluetoothController.getBluetoothAdapter().startDiscovery();
+        BluetoothConnectionManager.getBluetoothAdapter().startDiscovery();
     }
 
     @Override
@@ -173,7 +173,7 @@ public class SearchDeviceActivity extends AppCompatActivity
                 this.finish();
                 return true;
             case R.id.action_discoverable:
-                BluetoothController.makeDiscoverable(this);
+                BluetoothConnectionManager.makeDiscoverable(this);
                 return true;
             case R.id.action_refresh:
                 this.doDiscovery();
