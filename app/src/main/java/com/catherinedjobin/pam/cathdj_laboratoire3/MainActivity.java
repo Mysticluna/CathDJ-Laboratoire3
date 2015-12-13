@@ -13,13 +13,14 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Arrays;
+import java.io.OutputStreamWriter;
+import java.nio.CharBuffer;
 
 public class MainActivity extends AppCompatActivity
         implements BluetoothConnectionManager.BluetoothConnectionHandler {
 
     private static final int REQUEST_SEND_IMAGE = 1337;
+    private static final int MEGABYTE_BYTE_COUNT = 1024;
     private volatile BluetoothSocket bluetoothSocket;
 
     @Override
@@ -78,12 +79,13 @@ public class MainActivity extends AppCompatActivity
                             data.getStringExtra(SearchDeviceActivity.EXTRA_DEVICE_ADDRESS);
                     if (address != null) {
                         BluetoothSocket testSocket = null;
+                        OutputStreamWriter writer = null;
                         try {
                             testSocket = BluetoothConnectionManager.getInstance()
                                                                    .connectToDevice(address);
-                            OutputStream stream = testSocket.getOutputStream();
-                            stream.write("Hello".getBytes());
-                            stream.flush();
+
+                            writer = new OutputStreamWriter(testSocket.getOutputStream());
+                            writer.write("Hello");
                         } catch (IOException e) {
                             e.printStackTrace();
                             Toast.makeText(this,
@@ -91,9 +93,9 @@ public class MainActivity extends AppCompatActivity
                                            Toast.LENGTH_SHORT
                                           ).show();
                         } finally {
-                            if (testSocket != null) {
+                            if (writer != null) {
                                 try {
-                                    testSocket.close();
+                                    writer.close();
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
@@ -125,30 +127,43 @@ public class MainActivity extends AppCompatActivity
     public synchronized void onAccept(BluetoothSocket socket) throws IOException {
         if (socket != null) {
             this.bluetoothSocket = socket;
-            InputStream stream = null;
+            InputStream inputStream = null;
+            CharBuffer buffer = CharBuffer.allocate(MEGABYTE_BYTE_COUNT);
+            int c = 0;
             try {
-                stream = this.bluetoothSocket.getInputStream();
-                byte[] bytes = new byte[1024 * 1024];
-                Arrays.fill(bytes, (byte) 0);
-                StringBuilder builder = new StringBuilder();
-                int count = stream.read(bytes);
-                while (count != -1) {
-                    builder.append(Arrays.toString(bytes));
-                    count = stream.read(bytes);
+                inputStream = this.bluetoothSocket.getInputStream();
+                while (c != -1) {
+                    if (!buffer.hasRemaining()) {
+                        buffer = CharBuffer.allocate(buffer.capacity() + MEGABYTE_BYTE_COUNT)
+                                           .put(buffer);
+                    }
+                    c = inputStream.read();
+                    buffer.put((char) c);
                 }
-                Log.d("TEST", builder.toString());
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-                if (stream != null) {
-                    stream.close();
+                if (inputStream != null) {
+                    inputStream.close();
                 }
+                if (this.bluetoothSocket != null) {
+                    // Supprime le socket. Ferme aussi le socket
+                    this.bluetoothSocket = null;
+                }
+                final String result = String.valueOf(buffer.array());
+                Log.d("Test", result);
+                this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MainActivity.this, result, Toast.LENGTH_LONG).show();
+                        BluetoothConnectionManager.getInstance().startServer(MainActivity.this);
+                    }
+                });
             }
-            this.bluetoothSocket = null;
         }
     }
 
-    public void onClickSendImage(View v) {
+    public synchronized void onClickSendImage(View v) {
         if (this.bluetoothSocket == null) {
             Toast.makeText(this,
                            R.string.message_error_not_connected,
@@ -162,7 +177,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void onClickOpenSearchDevice(View v) {
+    public synchronized void onClickOpenSearchDevice(View v) {
         this.startActivityForResult(new Intent(this, SearchDeviceActivity.class),
                                     SearchDeviceActivity.REQUEST_SELECT_DEVICE
                                    );

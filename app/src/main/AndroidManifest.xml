@@ -2,7 +2,7 @@
 <manifest
 	package="com.catherinedjobin.pam.cathdj_laboratoire3"
 	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools">
+	>
 	<!-- On ajoute la permission pour utiliser le bluetooth du cellulaire/tablette -->
 	<uses-permission android:name="android.permission.BLUETOOTH" />
 	<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -27,8 +27,7 @@
 		<activity
 			android:name=".SearchDeviceActivity"
 			android:label="@string/title_activity_search_device"
-			android:parentActivityName=".MainActivity"
-			tools:targetApi="jelly_bean">
+			android:parentActivityName=".MainActivity">
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
 				android:value="com.catherinedjobin.pam.cathdj_laboratoire3.MainActivity" />

@@ -165,11 +165,11 @@ public final class BluetoothConnectionManager {
      */
     public synchronized BluetoothServerSocket getServerSocket() throws IOException {
         if (this.serverSocket == null) {
-            this.serverSocket = BluetoothConnectionManager.getBluetoothAdapter()
-                                                          .listenUsingRfcommWithServiceRecord
-                                                                   (this.appName,
-                                                                    bluetoothUUID
-                                                                   );
+            this.serverSocket =
+                    BluetoothConnectionManager.getBluetoothAdapter()
+                                              .listenUsingRfcommWithServiceRecord(this.appName,
+                                                                                  bluetoothUUID
+                                                                                 );
         }
         return this.serverSocket;
     }
@@ -206,7 +206,9 @@ public final class BluetoothConnectionManager {
                     BluetoothConnectionManager.this.stopServer();
                     handler.onAccept(socket);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    if (e.getMessage().compareTo("Operation Canceled") != 0) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
