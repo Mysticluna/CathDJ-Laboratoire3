@@ -9,6 +9,7 @@ import android.provider.MediaStore.Images.Media;
 import android.support.v4.graphics.BitmapCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity
@@ -102,6 +104,7 @@ public class MainActivity extends AppCompatActivity
                             int byteCount = BitmapCompat.getAllocationByteCount(bitmap);
                             ByteBuffer buffer = ByteBuffer.allocate(byteCount);
                             bitmap.copyPixelsToBuffer(buffer);
+                            Log.d(TAG, "Buffer: " + Arrays.toString(buffer.array()));
                             buffer.rewind();
                             BluetoothConnectionManager.getInstance()
                                                       .connectToDevice(this.address, this, buffer);
@@ -175,6 +178,8 @@ public class MainActivity extends AppCompatActivity
                     e.printStackTrace();
                 }
                 if (buffer != null) {
+                    Log.d(TAG, "Buffer: " + Arrays.toString(buffer.array()));
+                    // FIXME: BROKEN... :(
                     Bitmap bitmap = BitmapFactory.decodeByteArray(buffer.array(),
                                                                   buffer.arrayOffset(),
                                                                   buffer.position()
