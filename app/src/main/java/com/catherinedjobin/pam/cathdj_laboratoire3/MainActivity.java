@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
@@ -36,14 +37,15 @@ public class MainActivity extends AppCompatActivity
     private static final int REQUEST_SEND_IMAGE = 1337;
     private static final int MEGABYTE_BYTE_COUNT = 1024 * 1024;
     private static final int RGBA_PIXEL_BYTE_COUNT = 4;
-    private final File downloadDir =
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+    private final File pictureDir =
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
     /**
      * Synchronize block object
      */
     private final Object lock = new Object();
     private ViewSwitcher viewSwitcher;
     private String address;
+    private ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,9 +57,10 @@ public class MainActivity extends AppCompatActivity
             this.viewSwitcher = (ViewSwitcher) this.findViewById(R.id.main_view_switcher);
             this.viewSwitcher.setInAnimation(this, android.R.anim.fade_in);
             this.viewSwitcher.setOutAnimation(this, android.R.anim.fade_out);
+            this.imageView = (ImageView) this.findViewById(R.id.main_image);
         }
-        if (this.downloadDir.isDirectory() || this.downloadDir.mkdirs()) {
-            Log.d(TAG, "Download Directory: " + this.downloadDir.getAbsolutePath());
+        if (this.pictureDir.isDirectory() || this.pictureDir.mkdirs()) {
+            Log.d(TAG, "Download Directory: " + this.pictureDir.getAbsolutePath());
         }
     }
 
@@ -185,42 +188,69 @@ public class MainActivity extends AppCompatActivity
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                if (buffer != null) {
-                    Log.d(TAG, "Buffer: " + Arrays.toString(buffer.array()));
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(buffer.array(),
-                                                                  buffer.arrayOffset(),
-                                                                  buffer.position()
-                                                                 );
-                    if (bitmap != null) {
-                        String name = UUID.randomUUID().toString() + ".jpeg";
-                        File file = new File(this.downloadDir, name);
-                        //FIXME: Ça sauve pas...
-                        FileOutputStream outputStream = new FileOutputStream(file);
-                        bitmap.compress(CompressFormat.JPEG, 100, outputStream);
-                    } else {
-                        this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(MainActivity.this,
-                                               R.string.message_error_image_sending_failed,
-                                               Toast.LENGTH_SHORT
-                                              ).show();
-                            }
-                        });
-
-                    }
-                }
+            }
+            if (buffer != null) {
+                Log.d(TAG, "Buffer: " + Arrays.toString(buffer.array()));
+                final Bitmap bitmap = BitmapFactory.decodeByteArray(buffer.array(),
+                                                                    buffer.arrayOffset(),
+                                                                    buffer.position()
+                                                                   );
                 this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         synchronized (MainActivity.this.lock) {
-                            MainActivity.this.viewSwitcher.reset();
-                            MainActivity.this.viewSwitcher.showNext();
+                            MainActivity.this.imageView.setImageBitmap(bitmap);
+                            MainActivity.this.imageView.setVisibility(View.VISIBLE);
                         }
-                        BluetoothConnectionManager.getInstance().startServer(MainActivity.this);
                     }
                 });
+                if (bitmap != null) {
+                    String name = UUID.randomUUID().toString() + ".jpeg";
+                    File file = new File(this.pictureDir, name);
+                    FileOutputStream outputStream = null;
+                    try {
+                        //FIXME: It doesn't write to file...
+                        outputStream = new FileOutputStream(file);
+                        bitmap.compress(CompressFormat.JPEG, 50, outputStream);
+                        Media.insertImage(this.getContentResolver(),
+                                          file.getAbsolutePath(),
+                                          name,
+                                          null
+                                         );
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            if (outputStream != null) {
+                                outputStream.close();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } else {
+                    this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MainActivity.this,
+                                           R.string.message_error_image_sending_failed,
+                                           Toast.LENGTH_SHORT
+                                          ).show();
+                        }
+                    });
+
+                }
             }
+            this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    synchronized (MainActivity.this.lock) {
+                        MainActivity.this.viewSwitcher.reset();
+                        MainActivity.this.viewSwitcher.showNext();
+                    }
+                    BluetoothConnectionManager.getInstance().startServer(MainActivity.this);
+                }
+            });
         }
     }
 
@@ -274,20 +304,20 @@ public class MainActivity extends AppCompatActivity
                     e.printStackTrace();
                 }
             }
-            this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    synchronized (MainActivity.this.lock) {
-                        MainActivity.this.address = null;
-                        MainActivity.this.viewSwitcher.reset();
-                        progressBar.setProgress(0);
-                        progressBar.setIndeterminate(true);
-                        MainActivity.this.viewSwitcher.showNext();
-                    }
-                    BluetoothConnectionManager.getInstance().startServer(MainActivity.this);
-                }
-            });
         }
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (MainActivity.this.lock) {
+                    MainActivity.this.address = null;
+                    MainActivity.this.viewSwitcher.reset();
+                    progressBar.setProgress(0);
+                    progressBar.setIndeterminate(true);
+                    MainActivity.this.viewSwitcher.showNext();
+                }
+                BluetoothConnectionManager.getInstance().startServer(MainActivity.this);
+            }
+        });
 
     }
 
