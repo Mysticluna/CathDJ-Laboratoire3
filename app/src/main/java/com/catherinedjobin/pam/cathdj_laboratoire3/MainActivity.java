@@ -265,6 +265,7 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void run() {
                     synchronized (MainActivity.this.lock) {
+                        MainActivity.this.address = null;
                         MainActivity.this.viewSwitcher.reset();
                         progressBar.setProgress(0);
                         progressBar.setIndeterminate(true);
