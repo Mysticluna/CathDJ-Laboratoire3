@@ -9,6 +9,9 @@
 	<string name="title_activity_search_device">Rechercher des appareils</string>
 	<string name="title_activity_search_device_active">En recherche d\'appareils</string>
 	<string name="message_error_image_sending_failed">L\'envoi de l\'image a échoué</string>
-	<string name="message_error_not_connected">Non connecté. Veuillez-vous connecter à un appareil</string>
+	<string name="message_error_no_device">Aucun appareil sélectionné. Veuillez selectionner un appareil</string>
 	<string name="message_error_device_not_supported">Cet appareil ne supporte pas le Bluetooth</string>
+	<string name="prompt_select_device">Sélectionner un appareil à connecter</string>
+	<string name="prompt_send_picture">Envoyer une photo</string>
+	<string name="message_info_uploading">Chargement en cours. Veuillez patienter.</string>
 </resources>

@@ -13,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,11 +31,23 @@ public final class BluetoothConnectionManager {
     public interface BluetoothConnectionHandler {
 
         /**
+         * Callback sur requête de connection au serveur.
+         *
          * @param socket
          *         Un {@link BluetoothSocket} connecté produit de
          *         {@link BluetoothServerSocket#accept()}
          */
         void onAccept(BluetoothSocket socket) throws IOException;
+
+        /**
+         * Callback sur de connection au client.
+         *
+         * @param socket
+         *         Un {@link BluetoothSocket} connecté
+         * @param data
+         *         Un {@link ByteBuffer} qui représente les données à envoyer
+         */
+        void onConnect(BluetoothSocket socket, ByteBuffer data);
     }
 
     private static final class BluetoothThreadFactory implements ThreadFactory {
@@ -48,9 +61,9 @@ public final class BluetoothConnectionManager {
 
         @Override
         public Thread newThread(@NonNull Runnable r) {
-            this.nameBuilder.append("-").append(this.counter.incrementAndGet());
+            this.nameBuilder.append(" #").append(this.counter.incrementAndGet());
             Thread result = new Thread(r, this.nameBuilder.toString());
-            this.nameBuilder.delete(this.nameBuilder.lastIndexOf("-"), this.nameBuilder.length());
+            this.nameBuilder.delete(this.nameBuilder.lastIndexOf(" #"), this.nameBuilder.length());
             return result;
         }
     }
@@ -183,7 +196,7 @@ public final class BluetoothConnectionManager {
     public synchronized ExecutorService getExecutorService() {
         if (this.executorService == null) {
             this.executorService =
-                    Executors.newCachedThreadPool(new BluetoothThreadFactory("BluetoothThread"));
+                    Executors.newCachedThreadPool(new BluetoothThreadFactory("Bluetooth Thread"));
         }
         return this.executorService;
     }
@@ -242,23 +255,30 @@ public final class BluetoothConnectionManager {
      * @throws IllegalArgumentException
      *         Si l'addresse MAC est invalide
      */
-    public synchronized BluetoothSocket connectToDevice(String address)
+    public synchronized void connectToDevice(String address,
+                                             final BluetoothConnectionHandler handler,
+                                             final ByteBuffer data)
             throws IOException, IllegalArgumentException {
         this.stopServer();
-        BluetoothSocket socket = null;
         if (BluetoothAdapter.checkBluetoothAddress(address)) {
             BluetoothDevice device = getBluetoothAdapter().getRemoteDevice(address);
             if (device != null) {
                 if (getBluetoothAdapter().isDiscovering()) {
                     getBluetoothAdapter().cancelDiscovery();
                 }
-                socket = device.createRfcommSocketToServiceRecord(bluetoothUUID);
+                final BluetoothSocket socket =
+                        device.createRfcommSocketToServiceRecord(bluetoothUUID);
                 socket.connect();
+                this.getExecutorService().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        handler.onConnect(socket, data);
+                    }
+                });
             }
         } else {
             throw new IllegalArgumentException("Addresse: " + address + " est invalide");
         }
-        return socket;
     }
 
 }
