@@ -175,12 +175,27 @@ public class MainActivity extends AppCompatActivity
                     e.printStackTrace();
                 }
                 if (buffer != null) {
-                    byte[] bytes = buffer.array();
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, buffer.position());
-                    String title = this.getString(R.string.app_name) + " "
-                                   + Calendar.getInstance().toString();
-                    // Sauvegarde de l'image
-                    Media.insertImage(this.getContentResolver(), bitmap, title, null);
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(buffer.array(),
+                                                                  buffer.arrayOffset(),
+                                                                  buffer.position()
+                                                                 );
+                    if (bitmap != null) {
+                        String title = this.getString(R.string.app_name) + " "
+                                       + Calendar.getInstance().toString();
+                        // Sauvegarde de l'image
+                        Media.insertImage(this.getContentResolver(), bitmap, title, null);
+                    } else {
+                        this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(MainActivity.this,
+                                               R.string.message_error_image_sending_failed,
+                                               Toast.LENGTH_SHORT
+                                              ).show();
+                            }
+                        });
+
+                    }
                 }
                 this.runOnUiThread(new Runnable() {
                     @Override
