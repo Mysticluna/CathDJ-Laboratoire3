@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_SEND_IMAGE = 1337;
-    private static final int MEGABYTE_BYTE_COUNT = 1024;
+    private static final int MEGABYTE_BYTE_COUNT = 1024 * 1024;
     private static final int RGBA_PIXEL_BYTE_COUNT = 4;
     /**
      * Synchronize block object
@@ -176,7 +176,7 @@ public class MainActivity extends AppCompatActivity
                 }
                 if (buffer != null) {
                     byte[] bytes = buffer.array();
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, buffer.position());
                     String title = this.getString(R.string.app_name) + " "
                                    + Calendar.getInstance().toString();
                     // Sauvegarde de l'image

@@ -14,4 +14,7 @@
 	<string name="prompt_select_device">Sélectionner un appareil à connecter</string>
 	<string name="prompt_send_picture">Envoyer une photo</string>
 	<string name="message_info_uploading">Chargement en cours. Veuillez patienter.</string>
+	<string name="message_info_no_device_found">Aucun appareil trouvé</string>
+	<string name="title_new_devices">Nouveaux appareils</string>
+	<string name="title_paired_devices">Appareils jumelés</string>
 </resources>
