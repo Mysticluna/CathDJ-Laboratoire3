@@ -1,5 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="app_name">CathDJ-Laboratoire3</string>
+	<string name="app_name" translatable="false">CathDJ-Laboratoire3</string>
 	<string name="action_discoverable">Make discoverable</string>
-	<string name="title_activity_search_device">SearchDeviceActivity</string>
+	<string name="action_refresh">Refresh</string>
+	<string name="message_error_device_not_supported">This device doesn\'t support Bluetooth</string>
+	<string name="message_error_image_sending_failed">Image has failed to send</string>
+	<string name="message_error_no_device">No device selected. Please select a device.</string>
+	<string name="message_error_connection_failed">Connection has failed</string>
+	<string name="message_info_connection_success">Connection has been successful</string>
+	<string name="message_info_no_device_found">No device found</string>
+	<string name="message_info_operation_cancelled">Operation cancelled</string>
+	<string name="message_error_image_loading_failed">Image failed to load</string>
+	<string name="message_info_uploading">Upload in progress. Please wait</string>
+	<string name="prompt_send_picture">Send a picture</string>
+	<string name="prompt_select_device">Select a device to connect</string>
+	<string name="title_activity_search_device">Search for devices</string>
+	<string name="title_activity_search_device_active">Searching for devices</string>
+	<string name="title_paired_devices">Paired devices</string>
+	<string name="title_new_devices">New devices</string>
+	<string name="title_new_image">Image</string>
 </resources>

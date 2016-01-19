@@ -6,5 +6,5 @@
 		android:id="@+id/action_discoverable"
 		android:orderInCategory="100"
 		android:title="@string/action_discoverable"
-		app:showAsAction="never"/>
+		app:showAsAction="never" />
 </menu>

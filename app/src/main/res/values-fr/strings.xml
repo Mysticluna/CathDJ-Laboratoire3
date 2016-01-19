@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="action_discoverable">Rendre découvrable</string>
+	<string name="action_refresh">Rafraîchir</string>
+	<string name="message_error_connection_failed">Connexion a échouée</string>
+	<string name="message_error_image_loading_failed">Le chargement de l\'image a échoué</string>
+	<string name="message_info_connection_success">Connexion a réussie</string>
+	<string name="message_info_operation_cancelled">L\'opération a été annulée</string>
+	<string name="title_activity_search_device">Rechercher des appareils</string>
+	<string name="title_activity_search_device_active">En recherche d\'appareils</string>
+	<string name="message_error_image_sending_failed">L\'envoi de l\'image a échoué</string>
+	<string name="message_error_no_device">Aucun appareil sélectionné. Veuillez selectionner un appareil</string>
+	<string name="message_error_device_not_supported">Cet appareil ne supporte pas le Bluetooth</string>
+	<string name="prompt_select_device">Sélectionner un appareil à connecter</string>
+	<string name="prompt_send_picture">Envoyer une photo</string>
+	<string name="message_info_uploading">Chargement en cours. Veuillez patienter.</string>
+	<string name="message_info_no_device_found">Aucun appareil trouvé</string>
+	<string name="title_new_devices">Nouveaux appareils</string>
+	<string name="title_paired_devices">Appareils jumelés</string>
+	<string name="title_new_image">Image</string>
+</resources>
